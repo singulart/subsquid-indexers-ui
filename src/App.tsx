@@ -39,7 +39,7 @@ const App = () => {
             <Card.Text>
               {status.lastComplete} / {status.chainHeight}
             </Card.Text>
-            <ProgressBar variant="info" now={progressPct(status)} label={`${progressPct(status).toFixed(2)}%`}/>
+            <ProgressBar variant="info" animated={!status.inSync} now={progressPct(status)} label={`${progressPct(status).toFixed(2)}%`}/>
           </Card.Body>
         </Card>
       </div>
@@ -49,7 +49,8 @@ const App = () => {
 }
 
 const progressPct = (status: IndexerStatus): number => {
-  return 100 * status.lastComplete / status.chainHeight;
+  const pct =  100 * status.lastComplete / status.chainHeight;
+  return Math.floor(pct * 100) / 100;
 }
 
 export default App;
