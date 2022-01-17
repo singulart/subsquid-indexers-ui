@@ -1,26 +1,55 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, { useEffect, useState } from 'react';
+import cron from 'cron';
+import axios from 'axios';
 import './App.css';
+import {IndexerStatus} from './types';
+import Card from 'react-bootstrap/Card';
+import { ProgressBar } from 'react-bootstrap';
 
-function App() {
+const DATA_FEED = process.env.DATA_FEED || 'http://localhost:8080/statuses'
+
+const App = () => {
+
+  const [statuses, setStatuses] = useState([] as IndexerStatus[]);
+
+  const [job] = useState(new cron.CronJob("0/30 * * * * *", async ()=>{
+    console.log(":task:");
+    const statuses: IndexerStatus[] = await (await axios.get(DATA_FEED)).data;
+    setStatuses(statuses);
+  }));
+
+  useEffect(() => {
+    job.start();
+  }, []);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
+    <div className="App d-flex align-content-stretch flex-wrap">
+    {statuses.map((status, idx) => (
+      <div className='p-2' key={idx}>
+        <Card
+          bg={status.inSync ? 'success': 'warning'}
+          key={idx}
+          text={'dark'}
+          style={{ width: '18rem' }}
+          className="mb-2"
         >
-          Learn React
-        </a>
-      </header>
+          <Card.Header>{status.network}</Card.Header>
+          <Card.Body>
+            <Card.Title>{status.inSync ? 'Synced': 'Sync in progress'}</Card.Title>
+            <Card.Text>
+              {status.lastComplete} / {status.chainHeight}
+            </Card.Text>
+            <ProgressBar variant="info" now={progressPct(status)} label={`${progressPct(status).toFixed(2)}%`}/>
+          </Card.Body>
+        </Card>
+      </div>
+    ))}
     </div>
   );
+}
+
+const progressPct = (status: IndexerStatus): number => {
+  return 100 * status.lastComplete / status.chainHeight;
 }
 
 export default App;
