@@ -1,12 +1,12 @@
-# Getting Started with Create React App
+# React App that displays Subsquid indexers statuses
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A simple React application that consumes a [Rest API](https://github.com/singulart/indexer-api) (deployed separately), and displays its response using Bootstrap components ([Card](https://react-bootstrap.github.io/components/cards/), [ProgressBar](https://react-bootstrap.github.io/components/progress/))
 
 ## Available Scripts
 
 In the project directory, you can run:
 
-### `npm start`
+### `DATA_FEED=https://<indexer api deployment>/statuses && npm start`
 
 Runs the app in the development mode.\
 Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
